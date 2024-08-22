@@ -1,5 +1,6 @@
 module Aggregators {
   use List;
+  use Time;
   use ReplicatedDist;
   use ReplicatedVar;
   use BlockDist;
@@ -104,6 +105,10 @@ module Aggregators {
   /****************************************************************************/
   /*************************** MULTI-ARRAY AGGREGATOR *************************/
   /****************************************************************************/
+  // Declare our global frontier queues.
+  var Dfrontier2 = {0..1} dmapped new replicatedDist();
+  var frontiers2: [Dfrontier2] list(int);
+
   // Declare default distribution.
   var SpecialtyVertexDist = new blockDist({0..<numLocales});
   var SpecialtyVertexDom  = {0..<numLocales} dmapped SpecialtyVertexDist;
@@ -123,8 +128,10 @@ module Aggregators {
     var lBuffers: [myLocaleSpace] [0..#bufferSize] aggType;
     var rBuffers: [myLocaleSpace] remoteBuffer(aggType);
     var bufferIdxs: [myLocaleSpace] int;
-
+    var RemoteProcessingDone: sync int;
+    
     proc ref postinit() {
+      RemoteProcessingDone.writeEF(1);
       for loc in myLocaleSpace do 
         rBuffers[loc] = new remoteBuffer(aggType, bufferSize, loc);
     }
@@ -162,6 +169,9 @@ module Aggregators {
       // Make bufferIdx constant and return if trying to buffer locally.
       const myBufferIdx = bufferIdx; 
       if myBufferIdx == 0 then return;
+      writeln("We get here 1!");
+      RemoteProcessingDone.readFE();
+      writeln("We get here 2!");
 
       // Get remote buffer and allocate that space, if it does not already
       // exist. The method `cachedAlloc` is defined in the module 
@@ -171,10 +181,10 @@ module Aggregators {
 
       // Put into rBuffer the contents of lBuffer.
       rBuffer.PUT(lBuffers[loc], myBufferIdx);
-      
+
       // On the remote locale, populate frontier from rBuffer.
-      on Locales[loc] {
-        ref f = frontiers[(frontiersIdx + 1) % 2];
+      begin on Locales[loc] {
+        ref f = frontiers2[(frontiersIdx + 1) % 2];
         for srcVal in rBuffer.localIter(remBufferPtr, myBufferIdx) {
           var (v,p) = srcVal;
           if !visitedMA.localAccess[v].testAndSet() {
@@ -182,6 +192,7 @@ module Aggregators {
             f.pushBack(v);
           }
         }
+        RemoteProcessingDone.writeEF(1);
         if freeData then rBuffer.localFree(remBufferPtr); // Free the memory.
       }
       if freeData then rBuffer.markFreed(); // Mark memory as freed.

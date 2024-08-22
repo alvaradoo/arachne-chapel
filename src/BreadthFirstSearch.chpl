@@ -1,5 +1,5 @@
 module BreadthFirstSearch {
-  // Chapel modules.
+  // Chapel standard modules.
   use List;
   use Set;
   use Time;
@@ -7,8 +7,9 @@ module BreadthFirstSearch {
   use ReplicatedDist;
   use ReplicatedVar;
 
-  // Package modules.
+  // Chapel package modules.
   use CopyAggregation;
+  use AggregationPrimitives;
   use Search;
 
   // Arachne modules.
@@ -90,9 +91,9 @@ module BreadthFirstSearch {
     var timer:stopwatch;
     
     if profile then timer.start();
-    coforall loc in Locales with (ref frontiers) do on loc {
-      frontiers[0] = new list(int, parSafe=true);
-      frontiers[1] = new list(int, parSafe=true);
+    coforall loc in Locales with (ref frontiers2) do on loc {
+      frontiers2[0] = new list(int, parSafe=true);
+      frontiers2[1] = new list(int, parSafe=true);
     }
     if profile {
       writef("Time for frontier initilization is %dr\n", timer.elapsed());
@@ -112,7 +113,7 @@ module BreadthFirstSearch {
     
     var frontierSize:int = 0;
     on graph.findLoc(internalSource) {
-      frontiers[frontiersIdx].pushBack(internalSource);
+      frontiers2[frontiersIdx].pushBack(internalSource);
       visitedMA[internalSource].write(true);
       parentsMA[internalSource] = internalSource;
     }
@@ -128,15 +129,15 @@ module BreadthFirstSearch {
       if profile then innerTimer.start();
       coforall loc in Locales with (+ reduce frontierSize) 
       do on loc {
-        frontierSize += frontiers[frontiersIdx].size;
+        frontierSize += frontiers2[frontiersIdx].size;
         var localeTimer:stopwatch;
         if profile then localeTimer.start();
-        forall u in frontiers[frontiersIdx] 
+        forall u in frontiers2[frontiersIdx] 
         with (var frontierAgg = new SpecialtyVertexDstAggregator((int,int))) {
           for v in graph.neighborsInternal(u) do
             frontierAgg.copy(graph.findLocNewer(v), (v,u));
         }
-        frontiers[frontiersIdx].clear();
+        frontiers2[frontiersIdx].clear();
         if profile {
           writef("Time on locale %i expanding frontier of size %i is %dr\n", 
                   here.id, frontierSize, localeTimer.elapsed());
