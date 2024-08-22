@@ -1,17 +1,21 @@
 module BreadthFirstSearchBenchmarker {
+  // Chapel standard modules.
   use Time;
   use Random;
-  use CommDiagnostics;
   use IO.FormattedIO;
   use IO;
-  use Search;
+
+  // Chapel package modules.
+  use CommDiagnostics;
   use Sort;
 
+  // Arachne modules.
   use Graph;
   use Generator;
   use VertexCentricGraph;
   use EdgeList;
   use BreadthFirstSearch;
+  use BreadthFirstSearchUtil;
   use Utils;
 
   config const filepath:string;
