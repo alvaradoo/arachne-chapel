@@ -6,7 +6,7 @@
 module VertexCentricGraph {
   use List;
   use BlockDist;
-  use EdgeCentricGraph;
+  use EdgeList;
   use Search;
   use Graph;
 
@@ -35,10 +35,10 @@ module VertexCentricGraph {
     var numEdges;
 
     /*
-      Using an existing `EdgeCentricGraph` object, initialize a 
+      Using an existing `EdgeList` object, initialize a 
       `VertexCentricGraph` object.
     */
-    proc init(graph: shared EdgeCentricGraph(?)) {
+    proc init(graph: shared EdgeList(?)) {
       super.init("VertexCentricGraph");
       var adjacencies = blockDist.createArray(
         {0..<graph.vertexMapper.size}, vertex

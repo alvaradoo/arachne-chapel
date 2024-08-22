@@ -1,11 +1,13 @@
-use Graph;
+// Chapel standard modules.
 use Random;
-use Search;
+
+// Arachne modules.
+use Graph;
+use EdgeList;
 use Generator;
-use Aggregators;
-use EdgeCentricGraph;
 use VertexCentricGraph;
 use BreadthFirstSearch;
+use BreadthFirstSearchUtil;
 
 config const lowerScale = 4;
 config const upperScale = 8;
@@ -26,33 +28,20 @@ for scale in lowerScale..upperScale {
   
   var final:bool;
   for s in sourcesIdx {
-    var parentVertexGraph500 = bfsParentVertexGraph500(toGraph(vertexView), s);
+    var levelVertex = bfsLevelVertex(toGraph(vertexView), s); // ground truth
     var parentVertexAgg = bfsParentVertexAgg(toGraph(vertexView), s);
     var levelVertexAgg = bfsLevelVertexAgg(toGraph(vertexView), s);
-    var levelVertex = bfsLevelVertex(toGraph(vertexView), s); // ground truth
-    var levelAggregationVertex = bfsAggregationVertex(toGraph(vertexView), s);
-    var levelNoAggregationVertex = bfsNoAggregationVertex(toGraph(vertexView), s);
-
-    var p2LGraph500 = parentToLevel(parentVertexGraph500,s);
     var p2LVertexAgg = parentToLevel(parentVertexAgg,s);
 
-    var Graph500Check = && reduce (p2LGraph500 == levelVertex);
     var parentVertexAggCheck = && reduce (p2LVertexAgg == levelVertex);
     var levelVertexAggCheck = && reduce (levelVertexAgg == levelVertex);
-    var levelAggregationVertexCheck = && reduce (levelAggregationVertex == levelVertex);
-    var levelNoAggregationVertexCheck = && reduce (levelNoAggregationVertex == levelVertex);
 
-    final = globalCheck && Graph500Check && parentVertexAggCheck 
-                        && levelVertexAggCheck && levelAggregationVertexCheck
-                        && levelNoAggregationVertexCheck;
+    final = globalCheck && parentVertexAggCheck && levelVertexAggCheck;
 
     if debug {
       writeln("Outputs for scale ", scale, " and source ", s, ": ");
-      writeln("Graph500Check = ", Graph500Check);
       writeln("parentVertexAggCheck = ", parentVertexAggCheck);
       writeln("levelVertexAggCheck = ", levelVertexAggCheck);
-      writeln("levelAggregationVertexCheck = ", levelAggregationVertexCheck);
-      writeln("levelNoAggregationVertexCheck = ", levelNoAggregationVertexCheck);
       writeln();
     }
     

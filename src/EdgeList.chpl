@@ -4,7 +4,7 @@
   locales. No special care is taken to ensure vertex neighborhoods are kept
   local.
 */
-module EdgeCentricGraph {
+module EdgeList {
   use Utils;
   use BlockDist;
   use List;
@@ -48,7 +48,7 @@ module EdgeCentricGraph {
   /*
     Class that represents a graph in an edge-centric manner. 
   */
-  class EdgeCentricGraph : Graph {
+  class EdgeList : Graph {
     var src;
     var dst;
     var seg;
@@ -59,10 +59,10 @@ module EdgeCentricGraph {
 
     /*
       Using two existing arrays that represent the source and destination
-      vertices of a graph, initialize an `EdgeCentricGraph` object.
+      vertices of a graph, initialize an `EdgeList` object.
     */
     proc init(src: [?sD] int, dst: [?dD] int) {
-      super.init("EdgeCentricGraph");
+      super.init("EdgeList");
       var (symmSrc, symmDst) = symmetrizeEdgeList(src, dst);
       var (sortedSymmSrc, sortedSymmDst) = sortEdgeList(symmSrc, symmDst);
       var (looplessSortedSymmSrc, looplessSortedSymmDst) = removeSelfLoops(

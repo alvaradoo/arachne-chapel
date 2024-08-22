@@ -7,7 +7,7 @@
 module Generator {
   use Random;
   use BlockDist;
-  use EdgeCentricGraph;
+  use EdgeList;
 
   proc assignQuadrant(iiBit:bool, jjBit:bool, bit:int):(int,int) {
     var start, end:int = 0; 
@@ -75,6 +75,6 @@ module Generator {
 
     forall (e,s,d) in zip(edges,src,dst) { (s,d) = e; }
 
-    return new shared EdgeCentricGraph(src, dst);
+    return new shared EdgeList(src, dst);
   }
 }

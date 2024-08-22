@@ -1,8 +1,11 @@
-use VertexCentricGraph;
-use EdgeCentricGraph;
+// Chapel standard modules.
 use BlockDist;
 use List;
 use Map;
+
+// Arachne modules.
+use VertexCentricGraph;
+use EdgeList;
 
 var src = blockDist.createArray({0..17}, int);
 var dst = blockDist.createArray({0..17}, int);
@@ -10,7 +13,7 @@ var dst = blockDist.createArray({0..17}, int);
 src = [0, 1, 2, 2, 3, 4, 4, 5, 6, 6, 7, 8, 9, 9, 10, 10, 10, 9];
 dst = [0, 2, 3, 4, 4, 5, 9, 6, 7, 7, 8, 9, 9, 9, 11, 12, 15, 10];
 
-var eGraph = new shared EdgeCentricGraph(src, dst);
+var eGraph = new shared EdgeList(src, dst);
 var vGraph = new shared VertexCentricGraph(eGraph);
 
 writeln("Internal neighbors function test:");

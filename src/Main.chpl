@@ -10,7 +10,7 @@ module Main {
   use Graph;
   use Generator;
   use VertexCentricGraph;
-  use EdgeCentricGraph;
+  use EdgeList;
   use BreadthFirstSearch;
   use Utils;
 
@@ -126,7 +126,7 @@ module Main {
     var ms = if isRandom then 2**scale * edgeFactor else 0;
 
     timer.start(); if measureComms then startCommDiagnostics();
-    var edgeView: shared EdgeCentricGraph(?);
+    var edgeView: shared EdgeList(?);
     if isRandom then edgeView = genRMATgraph(a,b,c,d,scale,ns,ms,maxWeight);
     else { try! edgeView = matrixMarketFileToGraph(filepath); }
     timer.stop(); if measureComms then stopCommDiagnostics();

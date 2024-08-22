@@ -1,6 +1,6 @@
 /*
   Contains utilities that are used in graph construction within the modules 
-  `EdgeCentricGraph` and `VertexCentricGraph`. Some of them are copied from 
+  `EdgeList` and `VertexCentricGraph`. Some of them are copied from 
   Arkouda functionality and adapted to work here.
 */
 module Utils {
@@ -14,7 +14,7 @@ module Utils {
   use IO.FormattedIO;
   use Time;
   use CommDiagnostics;
-  use EdgeCentricGraph;
+  use EdgeList;
 
   /* Pulled from Arkouda. Used as the comparator for arrays made of tuples. */
   record contrivedComparator {
@@ -512,7 +512,7 @@ module Utils {
       ind += 1;
     }
 
-    return new shared EdgeCentricGraph(src, dst);
+    return new shared EdgeList(src, dst);
   }
 
   proc gnp(n, m) {
@@ -522,7 +522,7 @@ module Utils {
     fillRandom(src, 0, n-1);
     fillRandom(dst, 0, n-1);
 
-    return new shared EdgeCentricGraph(src, dst);
+    return new shared EdgeList(src, dst);
   }
 
   /*

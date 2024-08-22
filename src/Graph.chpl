@@ -2,7 +2,7 @@ module Graph {
   use BlockDist;
   use ReplicatedDist;
 
-  use EdgeCentricGraph;
+  use EdgeList;
   use VertexCentricGraph;
 
   class Graph {
@@ -14,8 +14,8 @@ module Graph {
   var placeHolderBlockA = blockDist.createArray({0..1}, int);
   var placeHolderBlockAVertex = blockDist.createArray({0..1}, vertex);
 
-  proc toEdgeCentricGraph(inGraph:Graph) {
-    return try! inGraph:shared EdgeCentricGraph(
+  proc toEdgeList(inGraph:Graph) {
+    return try! inGraph:shared EdgeList(
       placeHolderBlockA.type,
       placeHolderBlockA.type,
       placeHolderBlockA.type,
