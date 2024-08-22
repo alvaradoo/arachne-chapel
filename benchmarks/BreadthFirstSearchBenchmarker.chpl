@@ -1,4 +1,4 @@
-module Main {
+module BreadthFirstSearchBenchmarker {
   use Time;
   use Random;
   use CommDiagnostics;
@@ -156,20 +156,10 @@ module Main {
     var eCounts: [1..trials] int;
     fillRandom(sources, 0, n-1);
     
-    if bfsAlgorithm == "graph500" then
-      runBFS(bfsParentVertexGraph500, vertexView, sources, runs, teps, eCounts, "parent");
-    else if bfsAlgorithm == "parentVertexAgg" then
+    if bfsAlgorithm == "parentVertexAgg" then
       runBFS(bfsParentVertexAgg, vertexView, sources, runs, teps, eCounts, "parent");
-    else if bfsAlgorithm == "jenkins" then
-      runBFS(bfsParentVertexJenkins, vertexView, sources, runs, teps, eCounts, "parent");
     else if (bfsAlgorithm == "levelVertexAgg") then
       runBFS(bfsLevelVertexAgg, vertexView, sources, runs, teps, eCounts, "level");
-    else if (bfsAlgorithm == "levelVertex") then
-      runBFS(bfsLevelVertex, vertexView, sources, runs, teps, eCounts, "level");
-    else if (bfsAlgorithm == "levelAggregationVertex") then
-      runBFS(bfsAggregationVertex, vertexView, sources, runs, teps, eCounts, "level");
-    else if (bfsAlgorithm == "levelNoAggregationVertex") then
-      runBFS(bfsNoAggregationVertex, vertexView, sources, runs, teps, eCounts, "level");
     else halt("Unrecognized BFS method");
 
     writef("%<40s %i\n", "SCALE:", scale);
