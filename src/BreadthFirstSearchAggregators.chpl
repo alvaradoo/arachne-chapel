@@ -1,3 +1,13 @@
+/* Provides the aggregators used by the multilocale version of breadth-first
+   search in the `BreadthFirstSearch` module.
+
+   The two main records are `LevelDstAggregator` which is used by 
+   `bfsLevelVertexAgg` and `ParentDstAggregator` which is used by
+   `bfsParentvertexAgg`. These are separated because their `_flushBuffer` 
+   methods are different. Currently, Chapel does not contain fleshed out
+   support for user-defined aggregators. As time passes, if support for this
+   grows, then we can refactor this code.
+*/
 module BreadthFirstSearchAggregators {
   // Chapel standard modules.
   use List;
@@ -23,12 +33,10 @@ module BreadthFirstSearchAggregators {
   var levelFrontierDom = {0..1} dmapped new replicatedDist();
   var levelFrontiers: [levelFrontierDom] list(int, parSafe=true);
   var levelFrontiersIdx:int;
-  
+
   /*
-    Aggregator to be utilized with Chapel lists in breadth-first search. 
-    Designed using works from:
-    (1) the `DstAggregator` that is in Arkouda and 
-    (2) https://chapel-lang.org/CHIUW/2021/Rolinger.pdf.
+    Record that aggregates writes to the frontiers that calculate the level
+    of each vertex in relation to a source vertex.
   */
   record LevelDstAggregator {
     type eltType;
@@ -119,6 +127,11 @@ module BreadthFirstSearchAggregators {
   // Declare global parents array to keep track of the parent of each vertex.
   var parents: [SpecialtyVertexDom] int;
 
+  /*
+    Record that aggregates writes to the frontiers that calculate the parent
+    of each vertex in the breadth-first search tree in relation to a 
+    source vertex.
+  */
   record ParentDstAggregator {
     type eltType;
     type aggType = eltType;
