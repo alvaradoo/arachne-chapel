@@ -1,0 +1,2 @@
+$CHPL_HOME/modules/dists/BlockDist.chpl:978: warning: returning an atomic by value is deprecated
+ALL TESTS PASSED.
