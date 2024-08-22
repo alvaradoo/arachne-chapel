@@ -29,18 +29,23 @@ for scale in lowerScale..upperScale {
   var final:bool;
   for s in sourcesIdx {
     var levelVertex = bfsLevelVertex(toGraph(vertexView), s); // ground truth
+    var parentVertex = bfsParentVertex(toGraph(vertexView), s);
     var parentVertexAgg = bfsParentVertexAgg(toGraph(vertexView), s);
     var levelVertexAgg = bfsLevelVertexAgg(toGraph(vertexView), s);
     var p2LVertexAgg = parentToLevel(parentVertexAgg,s);
+    var p2LVertex = parentToLevel(parentVertex,s);
 
     var parentVertexAggCheck = && reduce (p2LVertexAgg == levelVertex);
     var levelVertexAggCheck = && reduce (levelVertexAgg == levelVertex);
+    var parentVertexCheck = && reduce (p2LVertex == levelVertex);
 
-    final = globalCheck && parentVertexAggCheck && levelVertexAggCheck;
+    final = globalCheck && parentVertexAggCheck && levelVertexAggCheck
+                        && parentVertexCheck;
 
     if debug {
       writeln("Outputs for scale ", scale, " and source ", s, ": ");
       writeln("parentVertexAggCheck = ", parentVertexAggCheck);
+      writeln("parentVertexCheck = ", parentVertexCheck);
       writeln("levelVertexAggCheck = ", levelVertexAggCheck);
       writeln();
     }

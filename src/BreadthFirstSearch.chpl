@@ -1,3 +1,17 @@
+/* Provides different versions of breadth-first search functionality for graphs.
+
+  For shared-memory systems, `bfsLevelVertex` and `bfsParentVertex` are the 
+  default methods. For distributed-memory systems, `bfsLevelVertexAgg` and 
+  `bfsParentVertexAgg` are the preferred methods. 
+
+  The methods with level compute the level of each vertex in relation to the 
+  source vertex. On the other hand, the methods with parent compute the parent
+  of each vertex in the breadth-first search tree. 
+
+  Using the `parentToLevel` method in `BreadthFirstSearchUtil` will let you
+  reduce an array with parent information to level information. This can be used
+  for testing correctness of breadth-first search methods.
+*/
 module BreadthFirstSearch {
   // Chapel standard modules.
   use List;
@@ -20,6 +34,10 @@ module BreadthFirstSearch {
 
   param profile:bool = false;
 
+  /* 
+    Generates the level array for a given source vertex. To be used for
+    multilocale mode execution.
+  */
   proc bfsLevelVertexAgg(inGraph: shared Graph, internalSource:int) {
     var graph = toVertexCentricGraph(inGraph);
 
@@ -62,6 +80,10 @@ module BreadthFirstSearch {
     return level;
   }
 
+  /* 
+    Generates the parent array for a given source vertex. To be used for
+    multilocale mode execution.
+  */
   proc bfsParentVertexAgg(inGraph: shared Graph, internalSource:int) {
     var graph = toVertexCentricGraph(inGraph);
     var lo = graph.vertexMapper.domain.low;
@@ -131,6 +153,10 @@ module BreadthFirstSearch {
     return parents;
   }
 
+  /* 
+    Generates the level array for a given source vertex. To be used for
+    single locale mode execution.
+  */
   proc bfsLevelVertex(inGraph: shared Graph, internalSource:int) {
     var graph = toVertexCentricGraph(inGraph);
 
@@ -161,5 +187,42 @@ module BreadthFirstSearch {
       frontiersIdx = (frontiersIdx + 1) % 2;
     }
     return level;
+  }
+
+  /* 
+    Generates the parent array for a given source vertex. To be used for
+    single locale mode execution.
+  */
+  proc bfsParentVertex(inGraph: shared Graph, internalSource:int) {
+    var graph = toVertexCentricGraph(inGraph);
+
+    var frontiers: [{0..1}] list(int, parSafe=true);
+    frontiers[0] = new list(int, parSafe=true);
+    frontiers[1] = new list(int, parSafe=true);
+
+    var frontiersIdx = 0;
+    var currLevel = 0;
+    frontiers[frontiersIdx].pushBack(internalSource);
+    
+    var parent = blockDist.createArray(graph.vertexMapper.domain, int);
+    parent = -1;
+
+    while true {
+      var pendingWork:bool;
+      forall u in frontiers[frontiersIdx] with (|| reduce pendingWork) {
+        for v in graph.neighborsInternal(u) {
+          if parent[v] == -1 {
+            frontiers[(frontiersIdx + 1) % 2].pushBack(v);
+            parent[v] = u;
+            pendingWork = true;
+          }
+        }
+      }
+      frontiers[frontiersIdx].clear();
+      if !pendingWork then break;
+      currLevel += 1;
+      frontiersIdx = (frontiersIdx + 1) % 2;
+    }
+    return parent;
   }
 }
