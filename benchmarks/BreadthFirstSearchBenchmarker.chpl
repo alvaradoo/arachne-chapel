@@ -122,8 +122,8 @@ module BreadthFirstSearchBenchmarker {
 
     var timer:stopwatch;
     var isRandom = if filepath.size > 0 then false else true;
-    if measureComms && isRandom then commFileIdentifier = "benchmarks/" + identifier + "_" + scale:string;
-    else if measureComms then commFileIdentifier = "benchmarks/" + identifier;
+    if measureComms && isRandom then commFileIdentifier = "results/" + identifier + "_" + scale:string;
+    else if measureComms then commFileIdentifier = "results/" + identifier;
     else commFileIdentifier = "";
 
     var ns = if isRandom then 2**scale else 0;
@@ -164,6 +164,10 @@ module BreadthFirstSearchBenchmarker {
       runBFS(bfsParentVertexAgg, vertexView, sources, runs, teps, eCounts, "parent");
     else if (bfsAlgorithm == "levelVertexAgg") then
       runBFS(bfsLevelVertexAgg, vertexView, sources, runs, teps, eCounts, "level");
+    else if (bfsAlgorithm == "parentVertex") then
+      runBFS(bfsParentVertex, vertexView, sources, runs, teps, eCounts, "parent");
+    else if (bfsAlgorithm == "levelVertex") then
+      runBFS(bfsLevelVertex, vertexView, sources, runs, teps, eCounts, "level");
     else halt("Unrecognized BFS method");
 
     writef("%<40s %i\n", "SCALE:", scale);
