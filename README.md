@@ -1,5 +1,5 @@
 # Arachne-Chapel
-Experimental harness for Arachne without Arkouda dependencies. To be used for benchmarking and optimizing graph algorithms in Chapel.
+Experimental harness for Arachne without Arkouda dependencies. To be used for benchmarking and optimizing parallel and distributed graph algorithms in Chapel. 
 
 ## Requirements
 1. Every Chapel dependency.
